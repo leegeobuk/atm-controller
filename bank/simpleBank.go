@@ -9,3 +9,8 @@ type SimpleBank struct {
 func NewSimple() *SimpleBank {
 	return &SimpleBank{}
 }
+
+// VerifyCardNumber returns whether cardNumber is valid or not.
+func (s *SimpleBank) VerifyCardNumber(cardNumber string) bool {
+	return len(cardNumber) == 16
+}

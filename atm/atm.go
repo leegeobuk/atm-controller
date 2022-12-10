@@ -25,9 +25,6 @@ func New(bank bank.Bank, cashBin cashbin.CashBin) *ATM {
 // Start starts atm
 func (atm *ATM) Start() error {
 	fmt.Println("ATM controller started")
-	fmt.Println("How may I help you? ")
-	fmt.Println("1) Insert card")
-	fmt.Println("2) Exit")
 
 	return atm.showActions()
 }
@@ -35,16 +32,20 @@ func (atm *ATM) Start() error {
 func (atm *ATM) showActions() error {
 	var input int
 	for input != 1 || input != 2 {
+		atm.showFirstScreen()
 		_, err := fmt.Scanln(&input)
 		if err != nil {
 			return fmt.Errorf("start atm: %w", err)
 		}
 
 		if input == 1 {
-			fmt.Print("Enter your card number: ")
 			// verify card number
+			if isValid := atm.verifyCardNumber(); !isValid {
+				fmt.Println("Invalid card number entered for 3 times. Moving to previous screen.")
+				continue
+			}
 
-			fmt.Print("Enter your PIN number: ")
+			fmt.Print("Enter your PIN number (4 digits): ")
 			var pin string
 			fmt.Scanln(&pin)
 			fmt.Println(pin)
@@ -58,6 +59,31 @@ func (atm *ATM) showActions() error {
 	}
 
 	return nil
+}
+
+func (atm *ATM) showFirstScreen() {
+	fmt.Println("How may I help you? ")
+	fmt.Println("1) Insert card")
+	fmt.Println("2) Exit")
+}
+
+func (atm *ATM) verifyCardNumber() bool {
+	var cardNumber string
+	for i := 0; i < 3; i++ {
+		fmt.Print("Enter your card number (16 digits): ")
+		_, err := fmt.Scanln(&cardNumber)
+		if err != nil {
+			return false
+		}
+
+		if isValid := atm.bank.VerifyCardNumber(cardNumber); !isValid {
+			fmt.Println("Card number is not valid. Please try again.")
+		} else if isValid {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (atm *ATM) exit() {
