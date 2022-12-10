@@ -14,3 +14,7 @@ func NewSimple() *SimpleBank {
 func (s *SimpleBank) VerifyCardNumber(cardNumber string) bool {
 	return len(cardNumber) == 16
 }
+
+func (s *SimpleBank) VerifyPIN(pin string) bool {
+	return len(pin) == 4
+}

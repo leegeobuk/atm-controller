@@ -16,3 +16,6 @@
 
 # .idea
 .idea/
+
+# Go test coverage report
+coverage.html

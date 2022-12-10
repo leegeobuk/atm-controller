@@ -98,3 +98,40 @@ func TestSimpleBank_VerifyCardNumber(t *testing.T) {
 		})
 	}
 }
+
+func TestSimpleBank_VerifyPIN(t *testing.T) {
+	tests := []struct {
+		name string
+		pin  string
+		want bool
+	}{
+		{
+			name: "PIN length=1",
+			pin:  "1",
+			want: false,
+		},
+		{
+			name: "PIN length=2",
+			pin:  "12",
+			want: false,
+		},
+		{
+			name: "PIN length=3",
+			pin:  "123",
+			want: false,
+		},
+		{
+			name: "PIN length=4",
+			pin:  "1234",
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &SimpleBank{}
+			if got := s.VerifyPIN(tt.pin); got != tt.want {
+				t.Errorf("VerifyPIN(%s) = %v, want %v", tt.pin, got, tt.want)
+			}
+		})
+	}
+}

@@ -30,8 +30,9 @@ func (atm *ATM) Start() error {
 }
 
 func (atm *ATM) showActions() error {
+	const iter = 3
 	var input int
-	for input != 1 || input != 2 {
+	for true {
 		atm.showFirstScreen()
 		_, err := fmt.Scanln(&input)
 		if err != nil {
@@ -39,18 +40,7 @@ func (atm *ATM) showActions() error {
 		}
 
 		if input == 1 {
-			// verify card number
-			if isValid := atm.verifyCardNumber(); !isValid {
-				fmt.Println("Invalid card number entered for 3 times. Moving to previous screen.")
-				continue
-			}
-
-			fmt.Print("Enter your PIN number (4 digits): ")
-			var pin string
-			fmt.Scanln(&pin)
-			fmt.Println(pin)
-			// verify PIN number
-
+			atm.verificationStage(iter)
 		} else if input == 2 {
 			atm.exit()
 		} else {
@@ -65,25 +55,6 @@ func (atm *ATM) showFirstScreen() {
 	fmt.Println("How may I help you? ")
 	fmt.Println("1) Insert card")
 	fmt.Println("2) Exit")
-}
-
-func (atm *ATM) verifyCardNumber() bool {
-	var cardNumber string
-	for i := 0; i < 3; i++ {
-		fmt.Print("Enter your card number (16 digits): ")
-		_, err := fmt.Scanln(&cardNumber)
-		if err != nil {
-			return false
-		}
-
-		if isValid := atm.bank.VerifyCardNumber(cardNumber); !isValid {
-			fmt.Println("Card number is not valid. Please try again.")
-		} else if isValid {
-			return true
-		}
-	}
-
-	return false
 }
 
 func (atm *ATM) exit() {
