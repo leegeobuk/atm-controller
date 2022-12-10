@@ -1,6 +1,5 @@
 package bank
 
 // Bank processes requests from ATM
-type Bank struct {
-
+type Bank interface {
 }
