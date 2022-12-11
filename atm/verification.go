@@ -7,24 +7,28 @@ import (
 	"os"
 )
 
-func (atm *ATM) verificationStage(iter int) {
+func (atm *ATM) verifyUser(iter int) {
+	failedMsg := "Invalid %s entered for %d times. Moving to previous screen.\n"
+
 	// verify card number
-	if isValid := atm.verifyCardNumber(os.Stdin, iter); !isValid {
-		fmt.Printf("Invalid card number entered for %d times. Moving to previous screen.\n", iter)
+	var cardNumber string
+	if isValid := atm.verifyCardNumber(cardNumber, os.Stdin, iter); !isValid {
+		fmt.Printf(failedMsg, "card number", iter)
 		return
 	}
 
 	// verify PIN number
-	if isValid := atm.verifyPIN(os.Stdin, iter); !isValid {
-		fmt.Printf("Invalid PIN entered for %d times. Moving to previous screen.\n", iter)
+	var pin string
+	if isValid := atm.verifyPIN(pin, os.Stdin, iter); !isValid {
+		fmt.Printf(failedMsg, "PIN", iter)
 	} else if isValid {
-		atm.accountSelectionStage()
+		//userAccount := account.NewUser(cardNumber, pin)
+		atm.selectAccounts(cardNumber, pin)
 	}
 }
 
-func (atm *ATM) verifyCardNumber(r io.Reader, iter int) bool {
+func (atm *ATM) verifyCardNumber(cardNumber string, r io.Reader, iter int) bool {
 	scanner := bufio.NewScanner(r)
-	var cardNumber string
 	for i := 0; i < iter; i++ {
 		fmt.Print("Enter your card number (16 digits): ")
 		if scanner.Scan() {
@@ -44,9 +48,8 @@ func (atm *ATM) verifyCardNumber(r io.Reader, iter int) bool {
 	return false
 }
 
-func (atm *ATM) verifyPIN(r io.Reader, iter int) bool {
+func (atm *ATM) verifyPIN(pin string, r io.Reader, iter int) bool {
 	scanner := bufio.NewScanner(r)
-	var pin string
 	for i := 0; i < iter; i++ {
 		fmt.Print("Enter your PIN number (4 digits): ")
 		if scanner.Scan() {

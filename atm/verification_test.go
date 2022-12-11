@@ -23,8 +23,8 @@ func TestATM_verifyCardNumber(t *testing.T) {
 	validCardNumber := strings.NewReader("1234123412341234\n")
 
 	// when
-	invalid := simpleATM.verifyCardNumber(invalidCardNumber, iter)
-	valid := simpleATM.verifyCardNumber(validCardNumber, iter)
+	invalid := simpleATM.verifyCardNumber("", invalidCardNumber, iter)
+	valid := simpleATM.verifyCardNumber("", validCardNumber, iter)
 
 	// then
 	if invalid {
@@ -52,8 +52,8 @@ func TestATM_verifyPIN(t *testing.T) {
 	validPIN := strings.NewReader("1234\n")
 
 	// when
-	invalid := simpleATM.verifyPIN(invalidPIN, iter)
-	valid := simpleATM.verifyPIN(validPIN, iter)
+	invalid := simpleATM.verifyPIN("", invalidPIN, iter)
+	valid := simpleATM.verifyPIN("", validPIN, iter)
 
 	// then
 	if invalid {
