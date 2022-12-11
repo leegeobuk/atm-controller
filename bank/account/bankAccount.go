@@ -1,9 +1,11 @@
 package account
 
+import "github.com/leegeobuk/atm-controller/typeutil"
+
 // BankAccount represents bank account of a bank
-type BankAccount interface {
-	Balance() int
-	Deposit(amount int) int
-	Withdraw(amount int) (int, error)
+type BankAccount[T typeutil.Number] interface {
+	Balance() T
+	Deposit(amount T)
+	Withdraw(amount T) error
 	Name() string
 }

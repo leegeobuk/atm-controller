@@ -1,17 +1,18 @@
 package atm
 
 import (
-	"github.com/leegeobuk/atm-controller/bank"
-	"github.com/leegeobuk/atm-controller/cashbin"
 	"strings"
 	"testing"
+
+	"github.com/leegeobuk/atm-controller/bank"
+	"github.com/leegeobuk/atm-controller/cashbin"
 )
 
 func TestATM_verifyCardNumber(t *testing.T) {
 	// given
 	const iter = 3
-	simpleBank, cashBin := bank.NewSimple(), cashbin.NewSimple()
-	simpleATM := New(simpleBank, cashBin)
+	simpleBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
+	simpleATM := New[int](simpleBank, cashBin)
 
 	sb := strings.Builder{}
 	for i := 0; i < iter; i++ {
@@ -23,8 +24,8 @@ func TestATM_verifyCardNumber(t *testing.T) {
 	validCardNumber := strings.NewReader("1234123412341234\n")
 
 	// when
-	invalid := simpleATM.verifyCardNumber("", invalidCardNumber, iter)
-	valid := simpleATM.verifyCardNumber("", validCardNumber, iter)
+	_, invalid := simpleATM.verifyCardNumber(invalidCardNumber, iter)
+	_, valid := simpleATM.verifyCardNumber(validCardNumber, iter)
 
 	// then
 	if invalid {
@@ -39,8 +40,8 @@ func TestATM_verifyCardNumber(t *testing.T) {
 func TestATM_verifyPIN(t *testing.T) {
 	// given
 	const iter = 3
-	simpleBank, cashBin := bank.NewSimple(), cashbin.NewSimple()
-	simpleATM := New(simpleBank, cashBin)
+	simpleBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
+	simpleATM := New[int](simpleBank, cashBin)
 
 	sb := strings.Builder{}
 	for i := 0; i < iter; i++ {
@@ -52,8 +53,8 @@ func TestATM_verifyPIN(t *testing.T) {
 	validPIN := strings.NewReader("1234\n")
 
 	// when
-	invalid := simpleATM.verifyPIN("", invalidPIN, iter)
-	valid := simpleATM.verifyPIN("", validPIN, iter)
+	_, invalid := simpleATM.verifyPIN(invalidPIN, iter)
+	_, valid := simpleATM.verifyPIN(validPIN, iter)
 
 	// then
 	if invalid {
