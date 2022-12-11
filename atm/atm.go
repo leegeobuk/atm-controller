@@ -40,7 +40,7 @@ func (atm *ATM) showActions() error {
 		}
 
 		if input == 1 {
-			atm.verificationStage(iter)
+			atm.verifyUser(iter)
 		} else if input == 2 {
 			atm.exit()
 		} else {
