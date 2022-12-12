@@ -7,26 +7,26 @@ import (
 	"os"
 )
 
-func (atm *ATM[T]) verifyUser(iter int) {
-	// verify card number
-	cardNumber, isValid := atm.verifyCardNumber(os.Stdin, iter)
-	if !isValid {
-		fmt.Printf(wrongInputMsg, "card number", iter)
+func (atm *ATM[T]) promptVerification(iter int) {
+	cardNumber, err := atm.promptCardNumber(os.Stdin, iter)
+	if err != nil {
+		fmt.Printf(inputFailedMsg, "card number verification", iter)
 		return
 	}
 
-	// verify PIN number
-	pin, isValid := atm.verifyPIN(os.Stdin, iter)
-	if !isValid {
-		fmt.Printf(wrongInputMsg, "PIN", iter)
-	} else if isValid {
-		//userAccount := account.NewUser(wantPIN, pin)
-		atm.promptBankAccounts(cardNumber, pin, iter)
+	pin, err := atm.promptPIN(os.Stdin, iter)
+	if err != nil {
+		fmt.Printf(inputFailedMsg, "PIN verification", iter)
+		return
 	}
+
+	//userAccount := account.NewUser(wantPIN, pin)
+	atm.promptBankAccounts(cardNumber, pin, iter)
 }
 
-func (atm *ATM[T]) verifyCardNumber(r io.Reader, iter int) (string, bool) {
+func (atm *ATM[T]) promptCardNumber(r io.Reader, iter int) (string, error) {
 	scanner := bufio.NewScanner(r)
+
 	var cardNumber string
 	for i := 0; i < iter; i++ {
 		fmt.Print("Enter your card number (16 digits): ")
@@ -34,37 +34,42 @@ func (atm *ATM[T]) verifyCardNumber(r io.Reader, iter int) (string, bool) {
 			cardNumber = scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			return "", false
+			fmt.Printf("Error accepting card number: %v\n", err)
+			continue
 		}
 
 		if isValid := atm.bank.VerifyCardNumber(cardNumber); !isValid {
-			fmt.Println("Card number is not valid. Please try again.")
-		} else if isValid {
-			return cardNumber, true
+			fmt.Println("Card number doesn't exist. Please try again.")
+			continue
 		}
+
+		return cardNumber, nil
 	}
 
-	return "", false
+	return "", errInvalidInput
 }
 
-func (atm *ATM[T]) verifyPIN(r io.Reader, iter int) (string, bool) {
+func (atm *ATM[T]) promptPIN(r io.Reader, iter int) (string, error) {
 	scanner := bufio.NewScanner(r)
+
 	var pin string
 	for i := 0; i < iter; i++ {
-		fmt.Print("Enter your PIN number (4 digits): ")
+		fmt.Print("Enter your PIN (4 digits): ")
 		if scanner.Scan() {
 			pin = scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			return "", false
+			fmt.Printf("Error accepting PIN: %v\n", err)
+			continue
 		}
 
 		if isValid := atm.bank.VerifyPIN(pin); !isValid {
-			fmt.Println("PIN is not valid. Please try again.")
-		} else if isValid {
-			return pin, true
+			fmt.Println("PIN is not correct. Please try again.")
+			continue
 		}
+
+		return pin, nil
 	}
 
-	return "", false
+	return "", errInvalidInput
 }
