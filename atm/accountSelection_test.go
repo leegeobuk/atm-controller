@@ -35,15 +35,6 @@ func TestATM_selectBankAccounts(t *testing.T) {
 			wantIsValid: false,
 		},
 		{
-			name:        "fail case: input=-1, len(accounts)>1",
-			accounts:    append(accounts, &account.SimpleCheckingAccount[int]{}),
-			input:       "-1\n",
-			r:           nil,
-			iter:        3,
-			wantOption:  -1,
-			wantIsValid: false,
-		},
-		{
 			name:        "scanner error case: large input",
 			accounts:    accounts,
 			input:       largeInput,
@@ -76,12 +67,12 @@ func TestATM_selectBankAccounts(t *testing.T) {
 			// simulate failures for iter times
 			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			option, isValid := testATM.selectBankAccounts(tt.accounts, tt.r, tt.iter)
+			option, isValid := testATM.selectBankAccount(tt.accounts, tt.r, tt.iter)
 			if option != tt.wantOption {
-				t.Errorf("selectBankAccounts() option = %v, wantOption %v", option, tt.wantOption)
+				t.Errorf("selectBankAccount() option = %v, wantOption %v", option, tt.wantOption)
 			}
 			if isValid != tt.wantIsValid {
-				t.Errorf("selectBankAccounts() isValid = %v, wantIsValid %v", isValid, tt.wantIsValid)
+				t.Errorf("selectBankAccount() isValid = %v, wantIsValid %v", isValid, tt.wantIsValid)
 			}
 		})
 	}
