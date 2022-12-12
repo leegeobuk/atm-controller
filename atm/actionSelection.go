@@ -15,7 +15,7 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 	fmt.Printf("%s selected. ", account.Name())
 
 	for true {
-		if option, isValid := atm.selectBankActions(os.Stdin, iter); !isValid {
+		if option, err := atm.selectBankActions(os.Stdin, iter); err != nil {
 			fmt.Printf(wrongInputMsg, "option", iter)
 			break
 		} else if option == 1 {
@@ -33,7 +33,7 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 				fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
 			case 3:
 				if err = atm.bank.Withdraw(account, amount); err != nil {
-					fmt.Println("Withdrawal amount cannot be greater than the balance.")
+					fmt.Println("Withdrawal amount cannot be greater than balance.")
 				}
 				fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
 			}
@@ -45,7 +45,7 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 	}
 }
 
-func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, bool) {
+func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, error) {
 	scanner := bufio.NewScanner(r)
 	var input string
 	for i := 0; i < iter; i++ {
@@ -59,18 +59,20 @@ func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, bool) {
 			input = scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			return -1, false
+			fmt.Printf("Error accepting action to choose: %v\n", err)
+			break
 		}
 
 		option, err := strconv.Atoi(input)
 		if isValid := 1 <= option && option <= 5; err != nil || !isValid {
 			fmt.Println("Please enter from 1~5.")
-		} else if isValid {
-			return option, true
+			continue
 		}
+
+		return option, nil
 	}
 
-	return -1, false
+	return -1, errInvalidInput
 }
 
 // promptAmount prompts user to enter amount to deposit or withdraw.
