@@ -12,45 +12,39 @@ import (
 
 func (atm *ATM[T]) promptBankAccounts(cardNumber, pin string, iter int) {
 	fmt.Print("User verified. ")
-	accounts := atm.bank.GetBankAccounts(cardNumber, pin)
+	bankAccount := atm.bank.GetBankAccount(cardNumber, pin)
 
 	for true {
-		option, isValid := atm.selectBankAccount(accounts, os.Stdin, iter)
-		if !isValid {
+		option, err := atm.selectBankAccount(bankAccount, os.Stdin, iter)
+		if err != nil {
 			fmt.Printf(wrongInputMsg, "option", iter)
 			break
-		} else if isValid {
-			if option < len(accounts) {
-				atm.promptBankActions(accounts[option], iter)
-			} else if option == len(accounts) {
-				break
-			} else if option == len(accounts)+1 {
-				atm.exit()
-			}
+		} else if option == 1 {
+			atm.promptBankActions(bankAccount, iter)
+		} else if option == 2 {
+			break
+		} else if option == 3 {
+			atm.exit()
 		}
 	}
 }
 
-func (atm *ATM[T]) selectBankAccount(accounts []account.BankAccount[T], r io.Reader, iter int) (int, bool) {
+func (atm *ATM[T]) selectBankAccount(bankAccount account.BankAccount[T], r io.Reader, iter int) (int, error) {
 	scanner := bufio.NewScanner(r)
-	actions := make([]string, 0, len(accounts)+2)
-	for _, account := range accounts {
-		actions = append(actions, account.Name())
-	}
-	actions = append(actions, "Back", "Exit")
 
 	var input string
 	for i := 0; i < iter; i++ {
 		fmt.Println("Select bank account.")
-		for idx, action := range actions {
-			fmt.Printf("%d. %s\n", idx+1, action)
-		}
+		fmt.Printf("1. %s\n", bankAccount.Name())
+		fmt.Println("2. Back")
+		fmt.Println("3. Exit")
 
 		if scanner.Scan() {
 			input = scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			return -1, false
+			fmt.Printf("Error accepting account to choose: %v\n", err)
+			continue
 		}
 
 		option, err := strconv.Atoi(input)
@@ -59,12 +53,12 @@ func (atm *ATM[T]) selectBankAccount(accounts []account.BankAccount[T], r io.Rea
 			continue
 		}
 
-		if isValid := 1 <= option && option <= len(actions); !isValid {
-			fmt.Printf("please enter between %d~%d\n", 1, len(actions))
+		if isValid := 1 <= option && option <= 3; !isValid {
+			fmt.Println("please enter between 1~3")
 		} else if isValid {
-			return option - 1, true
+			return option, nil
 		}
 	}
 
-	return -1, false
+	return -1, errInvalidInput
 }
