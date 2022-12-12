@@ -1,6 +1,7 @@
 package atm
 
 import (
+	"errors"
 	"io"
 	"strings"
 	"testing"
@@ -49,7 +50,7 @@ func TestATM_promptCardNumber(t *testing.T) {
 			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
 			cardNumber, err := testATM.promptCardNumber(tt.r, tt.iter)
-			if err != tt.wantErr {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("promptCardNumber() err = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -127,7 +128,7 @@ func TestATM_promptPIN(t *testing.T) {
 			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
 			pin, err := testATM.promptPIN(tt.r, tt.iter)
-			if err != tt.wantErr {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("promptPIN() err = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
