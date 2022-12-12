@@ -11,8 +11,8 @@ import (
 
 func TestATM_verifyCardNumber(t *testing.T) {
 	//given
-	simpleBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
-	simpleATM := New[int](simpleBank, cashBin)
+	newBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
+	newATM := New[int](newBank, cashBin)
 	sb := strings.Builder{}
 
 	tests := []struct {
@@ -49,7 +49,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 			tt.r = strings.NewReader(sb.String())
 			sb.Reset()
 
-			cardNumber, isValid := simpleATM.verifyCardNumber(tt.r, tt.iter)
+			cardNumber, isValid := newATM.verifyCardNumber(tt.r, tt.iter)
 			if cardNumber != tt.wantCardNumber {
 				t.Errorf("verifyCardNumber() cardNumber = %v, wantCardNumber %v", cardNumber, tt.wantCardNumber)
 			}
@@ -62,8 +62,8 @@ func TestATM_verifyCardNumber(t *testing.T) {
 
 func TestATM_verifyPIN(t *testing.T) {
 	//given
-	simpleBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
-	simpleATM := New[int](simpleBank, cashBin)
+	newBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
+	newATM := New[int](newBank, cashBin)
 	sb := strings.Builder{}
 
 	tests := []struct {
@@ -100,12 +100,12 @@ func TestATM_verifyPIN(t *testing.T) {
 			tt.r = strings.NewReader(sb.String())
 			sb.Reset()
 
-			pin, isValid := simpleATM.verifyPIN(tt.r, tt.iter)
+			pin, isValid := newATM.verifyPIN(tt.r, tt.iter)
 			if pin != tt.wantPIN {
-				t.Errorf("verifyPIN() pin = %v, want %v", pin, tt.wantPIN)
+				t.Errorf("verifyPIN() pin = %v, wantOption %v", pin, tt.wantPIN)
 			}
 			if isValid != tt.wantIsValid {
-				t.Errorf("verifyPIN() isValid = %v, want %v", isValid, tt.wantIsValid)
+				t.Errorf("verifyPIN() isValid = %v, wantOption %v", isValid, tt.wantIsValid)
 			}
 		})
 	}
