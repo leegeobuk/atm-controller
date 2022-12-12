@@ -1,6 +1,7 @@
 package atm
 
 import (
+	"io"
 	"strings"
 	"testing"
 
@@ -9,59 +10,103 @@ import (
 )
 
 func TestATM_verifyCardNumber(t *testing.T) {
-	// given
-	const iter = 3
+	//given
 	simpleBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
 	simpleATM := New[int](simpleBank, cashBin)
-
 	sb := strings.Builder{}
-	for i := 0; i < iter; i++ {
-		sb.WriteByte('1')
-		sb.WriteByte('\n')
+
+	tests := []struct {
+		name           string
+		input          string
+		r              io.Reader
+		iter           int
+		wantCardNumber string
+		wantIsValid    bool
+	}{
+		{
+			name:           "input=1",
+			input:          "1\n",
+			r:              nil,
+			iter:           3,
+			wantCardNumber: "",
+			wantIsValid:    false,
+		},
+		{
+			name:           "input=1234123412341234",
+			input:          "1234123412341234\n",
+			r:              nil,
+			iter:           3,
+			wantCardNumber: "1234123412341234",
+			wantIsValid:    true,
+		},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// simulate failures for iter times
+			for i := 0; i < tt.iter; i++ {
+				sb.WriteString(tt.input)
+			}
+			tt.r = strings.NewReader(sb.String())
+			sb.Reset()
 
-	invalidCardNumber := strings.NewReader(sb.String())
-	validCardNumber := strings.NewReader("1234123412341234\n")
-
-	// when
-	_, invalid := simpleATM.verifyCardNumber(invalidCardNumber, iter)
-	_, valid := simpleATM.verifyCardNumber(validCardNumber, iter)
-
-	// then
-	if invalid {
-		t.Errorf("verifyCardNumber(%s, %d) = %t, want %t", "invalidCardNumber", iter, invalid, false)
-	}
-
-	if !valid {
-		t.Errorf("verifyCardNumber(%s, %d) = %t, want %t", "validCardNumber", iter, valid, true)
+			cardNumber, isValid := simpleATM.verifyCardNumber(tt.r, tt.iter)
+			if cardNumber != tt.wantCardNumber {
+				t.Errorf("verifyCardNumber() cardNumber = %v, wantCardNumber %v", cardNumber, tt.wantCardNumber)
+			}
+			if isValid != tt.wantIsValid {
+				t.Errorf("verifyCardNumber() isValid = %v, wantCardNumber %v", isValid, tt.wantIsValid)
+			}
+		})
 	}
 }
 
 func TestATM_verifyPIN(t *testing.T) {
-	// given
-	const iter = 3
+	//given
 	simpleBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
 	simpleATM := New[int](simpleBank, cashBin)
-
 	sb := strings.Builder{}
-	for i := 0; i < iter; i++ {
-		sb.WriteByte('1')
-		sb.WriteByte('\n')
+
+	tests := []struct {
+		name        string
+		input       string
+		r           io.Reader
+		iter        int
+		wantPIN     string
+		wantIsValid bool
+	}{
+		{
+			name:        "input=1",
+			input:       "1\n",
+			r:           nil,
+			iter:        3,
+			wantPIN:     "",
+			wantIsValid: false,
+		},
+		{
+			name:        "input=1111",
+			input:       "1111\n",
+			r:           nil,
+			iter:        3,
+			wantPIN:     "1111",
+			wantIsValid: true,
+		},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// simulate failures for iter times
+			for i := 0; i < tt.iter; i++ {
+				sb.WriteString(tt.input)
+			}
+			tt.r = strings.NewReader(sb.String())
+			sb.Reset()
 
-	invalidPIN := strings.NewReader(sb.String())
-	validPIN := strings.NewReader("1234\n")
-
-	// when
-	_, invalid := simpleATM.verifyPIN(invalidPIN, iter)
-	_, valid := simpleATM.verifyPIN(validPIN, iter)
-
-	// then
-	if invalid {
-		t.Errorf("verifyPIN(%s, %d) = %t, want %t", "invalidPIN", iter, invalid, false)
-	}
-
-	if !valid {
-		t.Errorf("verifyPIN(%s, %d) = %t, want %t", "validPIN", iter, valid, true)
+			pin, isValid := simpleATM.verifyPIN(tt.r, tt.iter)
+			if pin != tt.wantPIN {
+				t.Errorf("verifyPIN() pin = %v, want %v", pin, tt.wantPIN)
+			}
+			if isValid != tt.wantIsValid {
+				t.Errorf("verifyPIN() isValid = %v, want %v", isValid, tt.wantIsValid)
+			}
+		})
 	}
 }
