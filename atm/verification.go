@@ -2,15 +2,9 @@ package atm
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
-)
-
-var (
-	errInvalidInput = errors.New("invalid input")
-	wrongInputMsg   = "Invalid %s entered for %d times. Moving to previous screen.\n"
 )
 
 func (atm *ATM[T]) verifyUser(iter int) {

@@ -55,9 +55,10 @@ func (atm *ATM[T]) selectBankAccount(bankAccount account.BankAccount[T], r io.Re
 
 		if isValid := 1 <= option && option <= 3; !isValid {
 			fmt.Println("please enter between 1~3")
-		} else if isValid {
-			return option, nil
+			continue
 		}
+
+		return option, nil
 	}
 
 	return -1, errInvalidInput

@@ -10,7 +10,5 @@ func main() {
 	simpleBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
 	simpleATM := atm.New[int](simpleBank, cashBin)
 
-	if err := simpleATM.Start(); err != nil {
-		simpleATM.Terminate(err)
-	}
+	simpleATM.Start()
 }
