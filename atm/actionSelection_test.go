@@ -12,7 +12,7 @@ import (
 
 func TestATM_selectBankActions(t *testing.T) {
 	//given
-	testATM, _, largeInput := setup[int]()
+	testATM, largeInput := setup[int]()
 
 	tests := []struct {
 		name       string
@@ -74,7 +74,7 @@ func TestATM_selectBankActions(t *testing.T) {
 
 func TestATM_promptAmount(t *testing.T) {
 	// given
-	testATM, _, largeInput := setup[int]()
+	testATM, largeInput := setup[int]()
 
 	type tc[T typeutil.Number] struct {
 		name    string
