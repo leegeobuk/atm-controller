@@ -23,7 +23,7 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 		} else if option == 2 || option == 3 {
 			atm.depositOrWithdraw(account, option)
 		} else if option == 4 {
-			return
+			break
 		} else if option == 5 {
 			atm.exit()
 		}
@@ -39,7 +39,7 @@ func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, bool) {
 		fmt.Println("1. See balance")
 		fmt.Println("2. Deposit")
 		fmt.Println("3. Withdraw")
-		fmt.Println("4. Previous")
+		fmt.Println("4. Back")
 		fmt.Println("5. Exit")
 		if scanner.Scan() {
 			input = scanner.Text()

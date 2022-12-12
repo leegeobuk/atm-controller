@@ -14,21 +14,36 @@ func (atm *ATM[T]) promptBankAccounts(cardNumber, pin string, iter int) {
 	fmt.Print("User verified. ")
 	accounts := atm.bank.GetBankAccounts(cardNumber, pin)
 
-	option, isValid := atm.selectBankAccounts(accounts, os.Stdin, iter)
-	if !isValid {
-		fmt.Printf(wrongInputMsg, "option", iter)
-	} else if isValid {
-		atm.promptBankActions(accounts[option], iter)
+	for true {
+		option, isValid := atm.selectBankAccount(accounts, os.Stdin, iter)
+		if !isValid {
+			fmt.Printf(wrongInputMsg, "option", iter)
+			break
+		} else if isValid {
+			if option < len(accounts) {
+				atm.promptBankActions(accounts[option], iter)
+			} else if option == len(accounts) {
+				break
+			} else if option == len(accounts)+1 {
+				atm.exit()
+			}
+		}
 	}
 }
 
-func (atm *ATM[T]) selectBankAccounts(accounts []account.BankAccount[T], r io.Reader, iter int) (int, bool) {
+func (atm *ATM[T]) selectBankAccount(accounts []account.BankAccount[T], r io.Reader, iter int) (int, bool) {
 	scanner := bufio.NewScanner(r)
+	actions := make([]string, 0, len(accounts)+2)
+	for _, account := range accounts {
+		actions = append(actions, account.Name())
+	}
+	actions = append(actions, "Back", "Exit")
+
 	var input string
 	for i := 0; i < iter; i++ {
 		fmt.Println("Select bank account.")
-		for i, bankAccount := range accounts {
-			fmt.Printf("%d. %s\n", i+1, bankAccount.Name())
+		for idx, action := range actions {
+			fmt.Printf("%d. %s\n", idx+1, action)
 		}
 
 		if scanner.Scan() {
@@ -44,12 +59,8 @@ func (atm *ATM[T]) selectBankAccounts(accounts []account.BankAccount[T], r io.Re
 			continue
 		}
 
-		if isValid := 1 <= option && option <= len(accounts); !isValid {
-			if len(accounts) == 1 {
-				fmt.Println("Please enter 1.")
-			} else {
-				fmt.Printf("please enter between %d~%d\n", 1, len(accounts))
-			}
+		if isValid := 1 <= option && option <= len(actions); !isValid {
+			fmt.Printf("please enter between %d~%d\n", 1, len(actions))
 		} else if isValid {
 			return option - 1, true
 		}
