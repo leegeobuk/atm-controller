@@ -16,14 +16,14 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 
 	for true {
 		if option, err := atm.selectBankActions(os.Stdin, iter); err != nil {
-			fmt.Printf(wrongInputMsg, "option", iter)
+			fmt.Printf(inputFailedMsg, "bank action selection", iter)
 			break
 		} else if option == 1 {
 			fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
 		} else if option == 2 || option == 3 {
 			amount, err := atm.promptAmount(os.Stdin, option, iter)
 			if err != nil {
-				fmt.Printf(wrongInputMsg, "amount", iter)
+				fmt.Printf(inputFailedMsg, "entering amount", iter)
 				continue
 			}
 
@@ -40,6 +40,7 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 		} else if option == 4 {
 			break
 		} else if option == 5 {
+			fmt.Println("Exit selected.")
 			atm.exit()
 		}
 	}

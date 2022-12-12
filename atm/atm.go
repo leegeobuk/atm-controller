@@ -15,7 +15,7 @@ import (
 
 var (
 	errInvalidInput = errors.New("invalid input")
-	wrongInputMsg   = "Invalid %s entered for %d times. Moving to previous screen.\n"
+	inputFailedMsg  = "Failed %s for %d times. Moving to previous screen.\n"
 )
 
 // ATM is where ATM controller starts from.
@@ -43,7 +43,7 @@ func (atm *ATM[T]) Start() {
 			fmt.Printf("Invalid option entered for %d times. Program terminates.\n", iter)
 			break
 		} else if option == 1 {
-			atm.verifyUser(iter)
+			atm.promptVerification(iter)
 		} else if option == 2 {
 			fmt.Println("Exit selected.")
 			atm.exit()

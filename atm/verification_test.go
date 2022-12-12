@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestATM_verifyCardNumber(t *testing.T) {
+func TestATM_promptCardNumber(t *testing.T) {
 	//given
 	testATM, largeInput := setup[int]()
 
@@ -16,7 +16,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 		r              io.Reader
 		iter           int
 		wantCardNumber string
-		wantIsValid    bool
+		wantErr        error
 	}{
 		{
 			name:           "fail case: input=1",
@@ -24,7 +24,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 			r:              nil,
 			iter:           3,
 			wantCardNumber: "",
-			wantIsValid:    false,
+			wantErr:        errInvalidInput,
 		},
 		{
 			name:           "scanner error case: large input",
@@ -32,7 +32,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 			r:              nil,
 			iter:           3,
 			wantCardNumber: "",
-			wantIsValid:    false,
+			wantErr:        errInvalidInput,
 		},
 		{
 			name:           "success case: input=1234123412341234",
@@ -40,7 +40,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 			r:              nil,
 			iter:           3,
 			wantCardNumber: "1234123412341234",
-			wantIsValid:    true,
+			wantErr:        nil,
 		},
 	}
 	for _, tt := range tests {
@@ -48,52 +48,77 @@ func TestATM_verifyCardNumber(t *testing.T) {
 			// simulate failures for iter times
 			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			cardNumber, isValid := testATM.verifyCardNumber(tt.r, tt.iter)
-			if cardNumber != tt.wantCardNumber {
-				t.Errorf("verifyCardNumber() cardNumber = %v, wantCardNumber %v", cardNumber, tt.wantCardNumber)
+			cardNumber, err := testATM.promptCardNumber(tt.r, tt.iter)
+			if err != tt.wantErr {
+				t.Errorf("promptCardNumber() err = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-			if isValid != tt.wantIsValid {
-				t.Errorf("verifyCardNumber() isValid = %v, wantCardNumber %v", isValid, tt.wantIsValid)
+			if cardNumber != tt.wantCardNumber {
+				t.Errorf("promptCardNumber() cardNumber = %v, wantCardNumber %v", cardNumber, tt.wantCardNumber)
 			}
 		})
 	}
 }
 
-func TestATM_verifyPIN(t *testing.T) {
+func TestATM_promptPIN(t *testing.T) {
 	//given
 	testATM, largeInput := setup[int]()
 
 	tests := []struct {
-		name        string
-		input       string
-		r           io.Reader
-		iter        int
-		wantPIN     string
-		wantIsValid bool
+		name    string
+		input   string
+		r       io.Reader
+		iter    int
+		wantPIN string
+		wantErr error
 	}{
 		{
-			name:        "fail case: input=1",
-			input:       "1\n",
-			r:           nil,
-			iter:        3,
-			wantPIN:     "",
-			wantIsValid: false,
+			name:    "fail case: input=1",
+			input:   "1\n",
+			r:       nil,
+			iter:    3,
+			wantPIN: "",
+			wantErr: errInvalidInput,
 		},
 		{
-			name:        "scanner error case: large input",
-			input:       largeInput,
-			r:           nil,
-			iter:        3,
-			wantPIN:     "",
-			wantIsValid: false,
+			name:    "fail case: large input",
+			input:   largeInput,
+			r:       nil,
+			iter:    3,
+			wantPIN: "",
+			wantErr: errInvalidInput,
 		},
 		{
-			name:        "success case: input=1111",
-			input:       "1111\n",
-			r:           nil,
-			iter:        3,
-			wantPIN:     "1111",
-			wantIsValid: true,
+			name:    "fail case: input=1",
+			input:   "1\n",
+			r:       nil,
+			iter:    3,
+			wantPIN: "",
+			wantErr: errInvalidInput,
+		},
+		{
+			name:    "fail case: input=11",
+			input:   "11\n",
+			r:       nil,
+			iter:    3,
+			wantPIN: "",
+			wantErr: errInvalidInput,
+		},
+		{
+			name:    "fail case: input=111",
+			input:   "111\n",
+			r:       nil,
+			iter:    3,
+			wantPIN: "",
+			wantErr: errInvalidInput,
+		},
+		{
+			name:    "success case: input=1111",
+			input:   "1111\n",
+			r:       nil,
+			iter:    3,
+			wantPIN: "1111",
+			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -101,12 +126,13 @@ func TestATM_verifyPIN(t *testing.T) {
 			// simulate failures for iter times
 			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			pin, isValid := testATM.verifyPIN(tt.r, tt.iter)
-			if pin != tt.wantPIN {
-				t.Errorf("verifyPIN() pin = %v, wantOption %v", pin, tt.wantPIN)
+			pin, err := testATM.promptPIN(tt.r, tt.iter)
+			if err != tt.wantErr {
+				t.Errorf("promptPIN() err = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-			if isValid != tt.wantIsValid {
-				t.Errorf("verifyPIN() isValid = %v, wantOption %v", isValid, tt.wantIsValid)
+			if pin != tt.wantPIN {
+				t.Errorf("promptPIN() pin = %v, wantPIN %v", pin, tt.wantPIN)
 			}
 		})
 	}

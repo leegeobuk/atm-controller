@@ -17,13 +17,14 @@ func (atm *ATM[T]) promptBankAccounts(cardNumber, pin string, iter int) {
 	for true {
 		option, err := atm.selectBankAccount(bankAccount, os.Stdin, iter)
 		if err != nil {
-			fmt.Printf(wrongInputMsg, "option", iter)
+			fmt.Printf(inputFailedMsg, "bank account selection", iter)
 			break
 		} else if option == 1 {
 			atm.promptBankActions(bankAccount, iter)
 		} else if option == 2 {
 			break
 		} else if option == 3 {
+			fmt.Println("Exit selected.")
 			atm.exit()
 		}
 	}
