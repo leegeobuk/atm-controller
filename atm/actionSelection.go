@@ -45,7 +45,7 @@ func (atm *ATM[T]) selectBankActions(account account.BankAccount[T], r io.Reader
 				break
 			}
 		} else if option == 1 {
-			fmt.Printf("%s balance: %d\n", account.Name(), atm.bank.Balance(account))
+			fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
 		} else if option == 2 || option == 3 {
 			atm.depositOrWithdraw(account, input)
 		} else if option == 4 {
@@ -79,13 +79,13 @@ func (atm *ATM[T]) depositOrWithdraw(account account.BankAccount[T], input strin
 	switch input {
 	case "2":
 		atm.bank.Deposit(account, value)
-		fmt.Printf("%s balance: %d\n", account.Name(), atm.bank.Balance(account))
+		fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
 	case "3":
 		if err = atm.bank.Withdraw(account, value); err != nil {
 			fmt.Printf("Error while withdrawing: %v\n", err)
 			return
 		}
-		fmt.Printf("%s balance: %d\n", account.Name(), atm.bank.Balance(account))
+		fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
 	}
 }
 

@@ -11,7 +11,6 @@ var wrongInputMsg = "Invalid %s entered for %d times. Moving to previous screen.
 
 func (atm *ATM[T]) verifyUser(iter int) {
 	// verify card number
-
 	cardNumber, isValid := atm.verifyCardNumber(os.Stdin, iter)
 	if !isValid {
 		fmt.Printf(wrongInputMsg, "card number", iter)
@@ -23,7 +22,7 @@ func (atm *ATM[T]) verifyUser(iter int) {
 	if !isValid {
 		fmt.Printf(wrongInputMsg, "PIN", iter)
 	} else if isValid {
-		//userAccount := account.NewUser(cardNumber, pin)
+		//userAccount := account.NewUser(wantPIN, pin)
 		atm.promptBankAccounts(cardNumber, pin, iter)
 	}
 }
