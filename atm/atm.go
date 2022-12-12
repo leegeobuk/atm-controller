@@ -28,14 +28,14 @@ func New[T typeutil.Number](bank bank.Bank[T], cashBin cashbin.CashBin) *ATM[T] 
 func (atm *ATM[T]) Start() error {
 	fmt.Println("ATM controller started")
 
-	return atm.showActions()
+	return atm.start()
 }
 
-func (atm *ATM[T]) showActions() error {
+func (atm *ATM[T]) start() error {
 	const iter = 3
 	var input int
 	for true {
-		atm.showMainScreen()
+		atm.promptMainScreen()
 		_, err := fmt.Scanln(&input)
 		if err != nil {
 			return fmt.Errorf("start atm: %w", err)
@@ -53,7 +53,7 @@ func (atm *ATM[T]) showActions() error {
 	return nil
 }
 
-func (atm *ATM[T]) showMainScreen() {
+func (atm *ATM[T]) promptMainScreen() {
 	fmt.Println("How may I help you? ")
 	fmt.Println("1) Insert card")
 	fmt.Println("2) Exit")
