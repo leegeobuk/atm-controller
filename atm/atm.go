@@ -1,12 +1,21 @@
 package atm
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
+	"io"
 	"os"
+	"strconv"
 
 	"github.com/leegeobuk/atm-controller/bank"
 	"github.com/leegeobuk/atm-controller/cashbin"
 	"github.com/leegeobuk/atm-controller/typeutil"
+)
+
+var (
+	errInvalidInput = errors.New("invalid input")
+	wrongInputMsg   = "Invalid %s entered for %d times. Moving to previous screen.\n"
 )
 
 // ATM is where ATM controller starts from.
@@ -24,43 +33,60 @@ func New[T typeutil.Number](bank bank.Bank[T], cashBin cashbin.CashBin) *ATM[T] 
 	}
 }
 
-// Start starts atm
-func (atm *ATM[T]) Start() error {
+// Start starts atm and prompts main screen
+func (atm *ATM[T]) Start() {
 	fmt.Println("ATM controller started")
 
-	return atm.start()
-}
-
-func (atm *ATM[T]) start() error {
 	const iter = 3
-	var input int
 	for true {
-		atm.promptMainScreen()
-		_, err := fmt.Scanln(&input)
-		if err != nil {
-			return fmt.Errorf("start atm: %w", err)
-		}
-
-		if input == 1 {
+		if option, err := atm.selectMainAction(os.Stdin, iter); err != nil {
+			fmt.Printf("Invalid option entered for %d times. Program terminates.\n", iter)
+			break
+		} else if option == 1 {
 			atm.verifyUser(iter)
-		} else if input == 2 {
+		} else if option == 2 {
+			fmt.Println("Exit selected.")
 			atm.exit()
-		} else {
-			fmt.Println("Please select 1 or 2")
 		}
 	}
-
-	return nil
 }
 
-func (atm *ATM[T]) promptMainScreen() {
-	fmt.Println("How may I help you? ")
-	fmt.Println("1) Insert card")
-	fmt.Println("2) Exit")
+func (atm *ATM[T]) selectMainAction(r io.Reader, iter int) (int, error) {
+	scanner := bufio.NewScanner(r)
+
+	var input string
+	for i := 0; i < iter; i++ {
+		fmt.Println("How may I help you?")
+		fmt.Println("1) Insert card")
+		fmt.Println("2) Exit")
+
+		if scanner.Scan() {
+			input = scanner.Text()
+		}
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Error accepting action to choose: %v\n", err)
+			continue
+		}
+
+		option, err := strconv.Atoi(input)
+		if err != nil {
+			fmt.Println("Please enter valid number. Try again.")
+			continue
+		}
+
+		if isValid := 1 <= option && option <= 2; !isValid {
+			fmt.Println("please enter 1 or 2.")
+			continue
+		}
+
+		return option, nil
+	}
+
+	return -1, errInvalidInput
 }
 
 func (atm *ATM[T]) exit() {
-	fmt.Println("Exit selected. Bye bye.")
+	fmt.Println("Bye bye.")
 	os.Exit(0)
 }
 
