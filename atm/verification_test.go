@@ -8,7 +8,7 @@ import (
 
 func TestATM_verifyCardNumber(t *testing.T) {
 	//given
-	testATM, _, largeInput := setup[int]()
+	testATM, largeInput := setup[int]()
 
 	tests := []struct {
 		name           string
@@ -61,7 +61,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 
 func TestATM_verifyPIN(t *testing.T) {
 	//given
-	testATM, _, largeInput := setup[int]()
+	testATM, largeInput := setup[int]()
 
 	tests := []struct {
 		name        string

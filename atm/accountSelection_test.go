@@ -1,22 +1,19 @@
 package atm
 
 import (
-	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 	"testing"
 
-	"github.com/leegeobuk/atm-controller/bank"
 	"github.com/leegeobuk/atm-controller/bank/account"
-	"github.com/leegeobuk/atm-controller/cashbin"
 	"github.com/leegeobuk/atm-controller/typeutil"
 )
 
 func TestATM_selectBankAccounts(t *testing.T) {
 	//given
-	testATM, bankAccount, largeInput := setup[int]()
+	testATM, largeInput := setup[int]()
+	bankAccount := &account.SimpleCheckingAccount[int]{}
 
 	type tc[T typeutil.Number] struct {
 		name       string
@@ -81,13 +78,4 @@ func TestATM_selectBankAccounts(t *testing.T) {
 			}
 		})
 	}
-}
-
-func setup[T typeutil.Number]() (testATM *ATM[T], bankAccount account.BankAccount[T], largeInput string) {
-	testBank, cashBin := bank.NewSimple[T](), cashbin.NewSimple()
-	testATM = New[T](testBank, cashBin)
-	bankAccount = &account.SimpleCheckingAccount[T]{}
-	largeInput = fmt.Sprintf("%s\n", strings.Repeat("1", bufio.MaxScanTokenSize))
-
-	return
 }
