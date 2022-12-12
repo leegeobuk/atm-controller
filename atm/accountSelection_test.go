@@ -78,11 +78,11 @@ func TestATM_selectBankAccounts(t *testing.T) {
 	}
 }
 
-func setup[T typeutil.Number]() (*ATM[T], []account.BankAccount[T], string) {
+func setup[T typeutil.Number]() (testATM *ATM[T], accounts []account.BankAccount[T], largeInput string) {
 	testBank, cashBin := bank.NewSimple[T](), cashbin.NewSimple()
-	testATM := New[T](testBank, cashBin)
-	accounts := []account.BankAccount[T]{&account.SimpleCheckingAccount[T]{}}
-	largeInput := strings.Repeat("a", bufio.MaxScanTokenSize)
+	testATM = New[T](testBank, cashBin)
+	accounts = []account.BankAccount[T]{&account.SimpleCheckingAccount[T]{}}
+	largeInput = strings.Repeat("a", bufio.MaxScanTokenSize)
 
-	return testATM, accounts, largeInput
+	return
 }
