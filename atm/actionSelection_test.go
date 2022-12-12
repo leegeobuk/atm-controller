@@ -166,12 +166,6 @@ func Test_stringToNumber(t *testing.T) {
 			want:    1,
 			wantErr: nil,
 		},
-		{
-			name:    "success case: input=-1",
-			amount:  "-1",
-			want:    -1,
-			wantErr: nil,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
