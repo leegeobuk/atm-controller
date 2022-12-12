@@ -13,6 +13,7 @@ import (
 func (atm *ATM[T]) promptBankAccounts(cardNumber, pin string, iter int) {
 	fmt.Print("User verified. ")
 	accounts := atm.bank.GetBankAccounts(cardNumber, pin)
+
 	option, isValid := atm.selectBankAccounts(accounts, os.Stdin, iter)
 	if !isValid {
 		fmt.Printf(wrongInputMsg, "option", iter)
