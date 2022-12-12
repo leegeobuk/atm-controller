@@ -87,7 +87,7 @@ func TestATM_promptAmount(t *testing.T) {
 	tests := []tc[int]{
 		{
 			name:    "fail case: input=-1",
-			input:   "-1",
+			input:   "-1\n",
 			r:       nil,
 			option:  2,
 			iter:    3,
@@ -95,7 +95,7 @@ func TestATM_promptAmount(t *testing.T) {
 			wantErr: errInvalidInput,
 		},
 		{
-			name:    "fail case: scanner error",
+			name:    "fail case: large input",
 			input:   largeInput,
 			r:       nil,
 			option:  2,
@@ -105,7 +105,7 @@ func TestATM_promptAmount(t *testing.T) {
 		},
 		{
 			name:    "fail case: parseInt error",
-			input:   "s",
+			input:   "s\n",
 			r:       nil,
 			option:  2,
 			iter:    3,
@@ -164,6 +164,12 @@ func Test_stringToNumber(t *testing.T) {
 			name:    "success case: input=1",
 			amount:  "1",
 			want:    1,
+			wantErr: nil,
+		},
+		{
+			name:    "success case: input=-1",
+			amount:  "-1",
+			want:    -1,
 			wantErr: nil,
 		},
 	}
