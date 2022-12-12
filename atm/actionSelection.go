@@ -2,13 +2,13 @@ package atm
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
 
 	"github.com/leegeobuk/atm-controller/bank/account"
+	"github.com/leegeobuk/atm-controller/typeutil"
 )
 
 func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
@@ -21,7 +21,22 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 		} else if option == 1 {
 			fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
 		} else if option == 2 || option == 3 {
-			atm.depositOrWithdraw(account, option)
+			amount, err := atm.promptAmount(os.Stdin, option, iter)
+			if err != nil {
+				fmt.Printf(wrongInputMsg, "amount", iter)
+				continue
+			}
+
+			switch option {
+			case 2:
+				atm.bank.Deposit(account, amount)
+				fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
+			case 3:
+				if err = atm.bank.Withdraw(account, amount); err != nil {
+					fmt.Println("Withdrawal amount cannot be greater than the balance.")
+				}
+				fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
+			}
 		} else if option == 4 {
 			break
 		} else if option == 5 {
@@ -32,9 +47,8 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 
 func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, bool) {
 	scanner := bufio.NewScanner(r)
-	count := 0
 	var input string
-	for true {
+	for i := 0; i < iter; i++ {
 		fmt.Println("Select what to do.")
 		fmt.Println("1. See balance")
 		fmt.Println("2. Deposit")
@@ -51,10 +65,6 @@ func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, bool) {
 		option, err := strconv.Atoi(input)
 		if isValid := 1 <= option && option <= 5; err != nil || !isValid {
 			fmt.Println("Please enter from 1~5.")
-			count++
-			if count == iter {
-				break
-			}
 		} else if isValid {
 			return option, true
 		}
@@ -63,48 +73,59 @@ func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, bool) {
 	return -1, false
 }
 
-func (atm *ATM[T]) depositOrWithdraw(account account.BankAccount[T], option int) {
-	var amount string
-	scanner := bufio.NewScanner(os.Stdin)
+// promptAmount prompts user to enter amount to deposit or withdraw.
+func (atm *ATM[T]) promptAmount(r io.Reader, option, iter int) (T, error) {
+	scanner := bufio.NewScanner(r)
 	m := map[int]string{2: "deposit", 3: "withdraw"}
-	fmt.Printf("Enter amount to %s: ", m[option])
-	if scanner.Scan() {
-		amount = scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
-		fmt.Printf("Error accepting amount to %s: %v", m[option], err)
-		return
-	}
 
-	value, err := atm.stringToNumber(amount)
-	if err != nil {
-		fmt.Println("Please enter numeric value.")
-	}
-
-	switch option {
-	case 2:
-		atm.bank.Deposit(account, value)
-		fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
-	case 3:
-		if err = atm.bank.Withdraw(account, value); err != nil {
-			fmt.Printf("Error while withdrawing: %v\n", err)
-			return
+	var input string
+	for i := 0; i < iter; i++ {
+		fmt.Printf("Enter amount to %s: ", m[option])
+		if scanner.Scan() {
+			input = scanner.Text()
 		}
-		fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
-	}
-}
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Error accepting amount to %s: %v", m[option], err)
+			continue
+		}
 
-func (atm *ATM[T]) stringToNumber(amount string) (T, error) {
-	intVal, err := strconv.Atoi(amount)
-	if err != nil {
-		floatVal, err := strconv.ParseFloat(amount, 64)
+		amount, err := stringToNumber[T](input)
 		if err != nil {
 			fmt.Println("Please enter numeric value.")
-			return -1, errors.New("amount not numeric")
+			continue
 		}
 
-		return T(floatVal), nil
+		if amount < 0 {
+			fmt.Println("Please enter positive value.")
+			continue
+		}
+
+		return amount, nil
 	}
 
-	return T(intVal), nil
+	return -1, errInvalidInput
+}
+
+func stringToNumber[T typeutil.Number](input string) (T, error) {
+	var amount T
+
+	numType := fmt.Sprintf("%T", *new(T))
+	switch numType {
+	case "int":
+		intVal, err := strconv.Atoi(input)
+		if err != nil {
+			return -1, err
+		}
+
+		amount = T(intVal)
+	case "float64":
+		floatVal, err := strconv.ParseFloat(input, 64)
+		if err != nil {
+			return -1, err
+		}
+
+		amount = T(floatVal)
+	}
+
+	return amount, nil
 }
