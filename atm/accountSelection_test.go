@@ -2,6 +2,7 @@ package atm
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -82,7 +83,7 @@ func setup[T typeutil.Number]() (testATM *ATM[T], accounts []account.BankAccount
 	testBank, cashBin := bank.NewSimple[T](), cashbin.NewSimple()
 	testATM = New[T](testBank, cashBin)
 	accounts = []account.BankAccount[T]{&account.SimpleCheckingAccount[T]{}}
-	largeInput = strings.Repeat("a", bufio.MaxScanTokenSize)
+	largeInput = fmt.Sprintf("%s\n", strings.Repeat("1", bufio.MaxScanTokenSize))
 
 	return
 }
