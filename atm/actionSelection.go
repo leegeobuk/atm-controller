@@ -14,15 +14,23 @@ import (
 func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 	fmt.Printf("%s selected. ", account.Name())
 
-	if isValid := atm.selectBankActions(account, os.Stdin, iter); !isValid {
+	if option, isValid := atm.selectBankActions(os.Stdin, iter); !isValid {
 		fmt.Printf(wrongInputMsg, "option", iter)
+	} else if option == 1 {
+		fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
+	} else if option == 2 || option == 3 {
+		atm.depositOrWithdraw(account, strconv.Itoa(option))
+	} else if option == 4 {
+		return
+	} else if option == 5 {
+		atm.exit()
 	}
 }
 
-func (atm *ATM[T]) selectBankActions(account account.BankAccount[T], r io.Reader, iter int) bool {
+func (atm *ATM[T]) selectBankActions(r io.Reader, iter int) (int, bool) {
 	scanner := bufio.NewScanner(r)
-	var input string
 	count := 0
+	var input string
 	for true {
 		fmt.Println("Select what to do.")
 		fmt.Println("1. See balance")
@@ -34,7 +42,7 @@ func (atm *ATM[T]) selectBankActions(account account.BankAccount[T], r io.Reader
 			input = scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			return false
+			return -1, false
 		}
 
 		option, err := strconv.Atoi(input)
@@ -44,18 +52,12 @@ func (atm *ATM[T]) selectBankActions(account account.BankAccount[T], r io.Reader
 			if count == iter {
 				break
 			}
-		} else if option == 1 {
-			fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
-		} else if option == 2 || option == 3 {
-			atm.depositOrWithdraw(account, input)
-		} else if option == 4 {
-			return true
-		} else if option == 5 {
-			atm.exit()
+		} else if isValid {
+			return option, true
 		}
 	}
 
-	return false
+	return -1, false
 }
 
 func (atm *ATM[T]) depositOrWithdraw(account account.BankAccount[T], input string) {
