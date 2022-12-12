@@ -25,10 +25,10 @@ func (s *SimpleBank[T]) VerifyPIN(pin string) bool {
 	return len(pin) == 4
 }
 
-// GetBankAccounts returns all bank accounts of user account.
-func (s *SimpleBank[T]) GetBankAccounts(cardNumber, pin string) []account.BankAccount[T] {
+// GetBankAccount returns all bank accounts of user account.
+func (s *SimpleBank[T]) GetBankAccount(cardNumber, pin string) account.BankAccount[T] {
 	// TODO: implement retrieval from db
-	return []account.BankAccount[T]{&account.SimpleCheckingAccount[T]{}}
+	return &account.SimpleCheckingAccount[T]{}
 }
 
 func (s *SimpleBank[T]) Balance(bankAccount account.BankAccount[T]) T {

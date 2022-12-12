@@ -2,6 +2,7 @@ package atm
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -15,52 +16,54 @@ import (
 
 func TestATM_selectBankAccounts(t *testing.T) {
 	//given
-	testATM, accounts, largeInput := setup[int]()
+	testATM, bankAccount, largeInput := setup[int]()
 
-	tests := []struct {
-		name        string
-		accounts    []account.BankAccount[int]
-		input       string
-		r           io.Reader
-		iter        int
-		wantOption  int
-		wantIsValid bool
-	}{
+	type tc[T typeutil.Number] struct {
+		name       string
+		account    account.BankAccount[T]
+		input      string
+		r          io.Reader
+		iter       int
+		wantOption int
+		wantErr    error
+	}
+
+	tests := []tc[int]{
 		{
-			name:        "fail case: input=-1, len(accounts)=1",
-			accounts:    accounts,
-			input:       "-1\n",
-			r:           nil,
-			iter:        3,
-			wantOption:  -1,
-			wantIsValid: false,
+			name:       "fail case: input=-1",
+			account:    bankAccount,
+			input:      "-1\n",
+			r:          nil,
+			iter:       3,
+			wantOption: -1,
+			wantErr:    errInvalidInput,
 		},
 		{
-			name:        "scanner error case: large input",
-			accounts:    accounts,
-			input:       largeInput,
-			r:           nil,
-			iter:        3,
-			wantOption:  -1,
-			wantIsValid: false,
+			name:       "fail case: large input",
+			account:    bankAccount,
+			input:      largeInput,
+			r:          nil,
+			iter:       3,
+			wantOption: -1,
+			wantErr:    errInvalidInput,
 		},
 		{
-			name:        "strconv error case: input=\"\"",
-			accounts:    accounts,
-			input:       "",
-			r:           nil,
-			iter:        3,
-			wantOption:  -1,
-			wantIsValid: false,
+			name:       "fail case: input=s",
+			account:    bankAccount,
+			input:      "s\n",
+			r:          nil,
+			iter:       3,
+			wantOption: -1,
+			wantErr:    errInvalidInput,
 		},
 		{
-			name:        "success case: input=1",
-			accounts:    accounts,
-			input:       "1\n",
-			r:           nil,
-			iter:        3,
-			wantOption:  0,
-			wantIsValid: true,
+			name:       "success case: input=1",
+			account:    bankAccount,
+			input:      "1\n",
+			r:          nil,
+			iter:       3,
+			wantOption: 1,
+			wantErr:    nil,
 		},
 	}
 	for _, tt := range tests {
@@ -68,21 +71,22 @@ func TestATM_selectBankAccounts(t *testing.T) {
 			// simulate failures for iter times
 			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			option, isValid := testATM.selectBankAccount(tt.accounts, tt.r, tt.iter)
+			option, err := testATM.selectBankAccount(tt.account, tt.r, tt.iter)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("selectBankAccount() err = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
 			if option != tt.wantOption {
 				t.Errorf("selectBankAccount() option = %v, wantOption %v", option, tt.wantOption)
-			}
-			if isValid != tt.wantIsValid {
-				t.Errorf("selectBankAccount() isValid = %v, wantIsValid %v", isValid, tt.wantIsValid)
 			}
 		})
 	}
 }
 
-func setup[T typeutil.Number]() (testATM *ATM[T], accounts []account.BankAccount[T], largeInput string) {
+func setup[T typeutil.Number]() (testATM *ATM[T], bankAccount account.BankAccount[T], largeInput string) {
 	testBank, cashBin := bank.NewSimple[T](), cashbin.NewSimple()
 	testATM = New[T](testBank, cashBin)
-	accounts = []account.BankAccount[T]{&account.SimpleCheckingAccount[T]{}}
+	bankAccount = &account.SimpleCheckingAccount[T]{}
 	largeInput = fmt.Sprintf("%s\n", strings.Repeat("1", bufio.MaxScanTokenSize))
 
 	return

@@ -85,7 +85,7 @@ func (atm *ATM[T]) promptAmount(r io.Reader, option, iter int) (T, error) {
 			input = scanner.Text()
 		}
 		if err := scanner.Err(); err != nil {
-			fmt.Printf("Error accepting amount to %s: %v", m[option], err)
+			fmt.Printf("Error accepting amount to %s: %v\n", m[option], err)
 			continue
 		}
 
