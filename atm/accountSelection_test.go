@@ -9,19 +9,12 @@ import (
 	"github.com/leegeobuk/atm-controller/bank"
 	"github.com/leegeobuk/atm-controller/bank/account"
 	"github.com/leegeobuk/atm-controller/cashbin"
+	"github.com/leegeobuk/atm-controller/typeutil"
 )
 
 func TestATM_selectBankAccounts(t *testing.T) {
 	//given
-	newBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
-	newATM := New[int](newBank, cashBin)
-	accounts := []account.BankAccount[int]{&account.SimpleCheckingAccount[int]{}}
-	sb := strings.Builder{}
-	for i := 0; i <= bufio.MaxScanTokenSize; i++ {
-		sb.WriteByte('a')
-	}
-	scannerErrInput := sb.String()
-	sb.Reset()
+	testATM, accounts, largeInput := setup[int]()
 
 	tests := []struct {
 		name        string
@@ -51,9 +44,9 @@ func TestATM_selectBankAccounts(t *testing.T) {
 			wantIsValid: false,
 		},
 		{
-			name:        "scanner error case: input=a*bufio.MaxScanTokenSize",
+			name:        "scanner error case: large input",
 			accounts:    accounts,
-			input:       scannerErrInput,
+			input:       largeInput,
 			r:           nil,
 			iter:        3,
 			wantOption:  -1,
@@ -80,13 +73,10 @@ func TestATM_selectBankAccounts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			for i := 0; i < tt.iter; i++ {
-				sb.WriteString(tt.input)
-			}
-			tt.r = strings.NewReader(sb.String())
-			sb.Reset()
+			// simulate failures for iter times
+			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			option, isValid := newATM.selectBankAccounts(tt.accounts, tt.r, tt.iter)
+			option, isValid := testATM.selectBankAccounts(tt.accounts, tt.r, tt.iter)
 			if option != tt.wantOption {
 				t.Errorf("selectBankAccounts() option = %v, wantOption %v", option, tt.wantOption)
 			}
@@ -95,4 +85,13 @@ func TestATM_selectBankAccounts(t *testing.T) {
 			}
 		})
 	}
+}
+
+func setup[T typeutil.Number]() (*ATM[T], []account.BankAccount[T], string) {
+	testBank, cashBin := bank.NewSimple[T](), cashbin.NewSimple()
+	testATM := New[T](testBank, cashBin)
+	accounts := []account.BankAccount[T]{&account.SimpleCheckingAccount[T]{}}
+	largeInput := strings.Repeat("a", bufio.MaxScanTokenSize)
+
+	return testATM, accounts, largeInput
 }

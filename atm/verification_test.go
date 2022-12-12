@@ -4,16 +4,11 @@ import (
 	"io"
 	"strings"
 	"testing"
-
-	"github.com/leegeobuk/atm-controller/bank"
-	"github.com/leegeobuk/atm-controller/cashbin"
 )
 
 func TestATM_verifyCardNumber(t *testing.T) {
 	//given
-	newBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
-	newATM := New[int](newBank, cashBin)
-	sb := strings.Builder{}
+	testATM, _, largeInput := setup[int]()
 
 	tests := []struct {
 		name           string
@@ -24,7 +19,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 		wantIsValid    bool
 	}{
 		{
-			name:           "input=1",
+			name:           "fail case: input=1",
 			input:          "1\n",
 			r:              nil,
 			iter:           3,
@@ -32,7 +27,15 @@ func TestATM_verifyCardNumber(t *testing.T) {
 			wantIsValid:    false,
 		},
 		{
-			name:           "input=1234123412341234",
+			name:           "scanner error case: large input",
+			input:          largeInput,
+			r:              nil,
+			iter:           3,
+			wantCardNumber: "",
+			wantIsValid:    false,
+		},
+		{
+			name:           "success case: input=1234123412341234",
 			input:          "1234123412341234\n",
 			r:              nil,
 			iter:           3,
@@ -43,13 +46,9 @@ func TestATM_verifyCardNumber(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// simulate failures for iter times
-			for i := 0; i < tt.iter; i++ {
-				sb.WriteString(tt.input)
-			}
-			tt.r = strings.NewReader(sb.String())
-			sb.Reset()
+			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			cardNumber, isValid := newATM.verifyCardNumber(tt.r, tt.iter)
+			cardNumber, isValid := testATM.verifyCardNumber(tt.r, tt.iter)
 			if cardNumber != tt.wantCardNumber {
 				t.Errorf("verifyCardNumber() cardNumber = %v, wantCardNumber %v", cardNumber, tt.wantCardNumber)
 			}
@@ -62,9 +61,7 @@ func TestATM_verifyCardNumber(t *testing.T) {
 
 func TestATM_verifyPIN(t *testing.T) {
 	//given
-	newBank, cashBin := bank.NewSimple[int](), cashbin.NewSimple()
-	newATM := New[int](newBank, cashBin)
-	sb := strings.Builder{}
+	testATM, _, largeInput := setup[int]()
 
 	tests := []struct {
 		name        string
@@ -75,7 +72,7 @@ func TestATM_verifyPIN(t *testing.T) {
 		wantIsValid bool
 	}{
 		{
-			name:        "input=1",
+			name:        "fail case: input=1",
 			input:       "1\n",
 			r:           nil,
 			iter:        3,
@@ -83,7 +80,15 @@ func TestATM_verifyPIN(t *testing.T) {
 			wantIsValid: false,
 		},
 		{
-			name:        "input=1111",
+			name:        "scanner error case: large input",
+			input:       largeInput,
+			r:           nil,
+			iter:        3,
+			wantPIN:     "",
+			wantIsValid: false,
+		},
+		{
+			name:        "success case: input=1111",
 			input:       "1111\n",
 			r:           nil,
 			iter:        3,
@@ -94,13 +99,9 @@ func TestATM_verifyPIN(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// simulate failures for iter times
-			for i := 0; i < tt.iter; i++ {
-				sb.WriteString(tt.input)
-			}
-			tt.r = strings.NewReader(sb.String())
-			sb.Reset()
+			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			pin, isValid := newATM.verifyPIN(tt.r, tt.iter)
+			pin, isValid := testATM.verifyPIN(tt.r, tt.iter)
 			if pin != tt.wantPIN {
 				t.Errorf("verifyPIN() pin = %v, wantOption %v", pin, tt.wantPIN)
 			}
