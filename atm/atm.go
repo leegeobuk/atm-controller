@@ -22,11 +22,11 @@ var (
 // It communicates with Bank and CashBin.
 type ATM[T typeutil.Number] struct {
 	bank    bank.Bank[T]
-	cashBin cashbin.CashBin
+	cashBin cashbin.CashBin[T]
 }
 
 // New returns ATM
-func New[T typeutil.Number](bank bank.Bank[T], cashBin cashbin.CashBin) *ATM[T] {
+func New[T typeutil.Number](bank bank.Bank[T], cashBin cashbin.CashBin[T]) *ATM[T] {
 	return &ATM[T]{
 		bank:    bank,
 		cashBin: cashBin,

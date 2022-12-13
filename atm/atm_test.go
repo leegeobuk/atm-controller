@@ -78,7 +78,7 @@ func TestATM_selectMainAction(t *testing.T) {
 
 func setup[T typeutil.Number]() (testATM *ATM[T], largeInput string) {
 	testDB := db.NewSimple[T]()
-	testBank, cashBin := bank.NewSimple[T](testDB), cashbin.NewSimple()
+	testBank, cashBin := bank.NewSimple[T](testDB), cashbin.NewSimple[T](1_000_000_000)
 	testATM = New[T](testBank, cashBin)
 	largeInput = fmt.Sprintf("%s\n", strings.Repeat("1", bufio.MaxScanTokenSize))
 

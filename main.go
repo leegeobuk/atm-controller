@@ -9,7 +9,7 @@ import (
 
 func main() {
 	simpleDB := db.NewSimple[int]()
-	simpleBank, cashBin := bank.NewSimple[int](simpleDB), cashbin.NewSimple()
+	simpleBank, cashBin := bank.NewSimple[int](simpleDB), cashbin.NewSimple[int](1_000_000_000)
 	simpleATM := atm.New[int](simpleBank, cashBin)
 
 	simpleATM.Start()
