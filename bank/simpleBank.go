@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrCardNumber = errors.New("card number doesn't exist")
+	ErrCardNumber = errors.New("unregistered card number")
 	ErrPIN        = errors.New("PIN doesn't match")
 )
 

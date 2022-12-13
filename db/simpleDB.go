@@ -7,8 +7,9 @@ import (
 )
 
 // SimpleDB implements DB.
-// It uses memory to store data.
+// It uses memory to store data making it very fragile.
 // No persistence is provided.
+// It should be used for testing and demo only.
 type SimpleDB[T typeutil.Number] struct {
 	store map[string]*_card.Card[T]
 }
