@@ -8,41 +8,41 @@ atm-controller is a simple ATM Controller that hugely simplified real-world atm-
 
 # Clone project  
 ## HTTPs  
-```git
+```bash
 git clone https://github.com/leegeobuk/atm-controller.git
 ```
 ## SSH
-```git
+```bash
 git clone git@github.com:leegeobuk/atm-controller.git
 ```
 
 # Test
 ## Unit test
-```makefile
+```bash
 make test
 ```
 
 ## coverage.html
-```makefile
+```bash
 make testcover
 ```
 
 # Build
-```makefile
+```bash
 make build os=<os> arch=<arch> name=<name>
 ```
 ## Linux
-```makefile
+```bash
 make build os=linux arch=amd64 name=atm-linux-amd64
 ```
 
 ## MacOS
-```makefile
+```bash
 make build os=darwin arch=amd64 name=atm-darwin-amd64
 ```
 
 ## Windows
-```makefile
+```bash
 make build os=windows arch=amd64 name=atm-windows-amd64.exe
 ```
 
@@ -50,7 +50,13 @@ After the ```make build``` command, then executable binary will be created with 
 Full list of supported OS and architecture: https://github.com/golang/go/blob/master/src/go/build/syslist.go
 
 # Run
+## Executable
 if name = atm-linux-amd64 then run  
 ```bash
 ./atm-linux-amd64
+```
+
+## Go run command
+```bash
+go run main.go
 ```
