@@ -25,10 +25,10 @@ func (atm *ATM[T]) promptVerification(iter int) {
 
 	card, err := atm.bank.VerifyCard(cardNumber, pin)
 	if errors.Is(err, bank.ErrCardNumber) {
-		fmt.Println("Card number doesn't exist. Please try again.")
+		fmt.Println("Unregistered card number entered. Please try again.")
 		return
 	} else if errors.Is(err, bank.ErrPIN) {
-		fmt.Println("PIN is not correct. Please try again.")
+		fmt.Println("Wrong PIN entered. Please try again.")
 		return
 	}
 
