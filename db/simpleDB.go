@@ -40,10 +40,11 @@ func (db *SimpleDB[T]) GetCard(carNumber string) (*_card.Card[T], bool) {
 // GetAccount returns bank account
 // linked to the card with given card number.
 func (db *SimpleDB[T]) GetAccount(cardNumber string) (account.BankAccount[T], bool) {
-	c, ok := db.store[cardNumber]
-	return c.BankAccount(), ok
+	card, ok := db.store[cardNumber]
+	return card.BankAccount(), ok
 }
 
+// UpdateAccount updates bank account.
 func (db *SimpleDB[T]) UpdateAccount(bankAccount account.BankAccount[T]) {
 	//TODO implement me
 	panic("implement me")
