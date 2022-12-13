@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrWithdrawAmount = errors.New("withdraw larger than balance")
+	ErrWithdrawAmount = errors.New("withdrawal larger than balance")
 	ErrWithdrawLimit  = errors.New("withdrawal limit reached")
 )
 
