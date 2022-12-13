@@ -8,7 +8,7 @@ import (
 
 var (
 	ErrWithdrawAmount = errors.New("withdraw larger than balance")
-	ErrWithdrawLimit  = errors.New("withdraw limit reached")
+	ErrWithdrawLimit  = errors.New("withdrawal limit reached")
 )
 
 // SimpleCheckingAccount is a checking account
@@ -43,6 +43,12 @@ func (acc *SimpleCheckingAccount[T]) Withdraw(amount T) error {
 
 	acc.balance -= amount
 	return nil
+}
+
+// Limit returns how many times withdrawals can be made.
+// Negative value means no limit.
+func (acc *SimpleCheckingAccount[T]) Limit() int {
+	return -1
 }
 
 // Type returns type of the bank account.
