@@ -4,3 +4,6 @@ test:  		## Run unit test with coverage
 
 testcover:	## Open coverage file as html
 	go tool cover -html=c.out
+
+build: 		## Build executable for linux
+	set	GOOS=$(os)& set	GOARCH=$(arch)& go build -o ./$(name) main.go
