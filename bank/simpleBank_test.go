@@ -1,8 +1,15 @@
 package bank
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/leegeobuk/atm-controller/db"
+)
 
 func TestSimpleBank_VerifyCardNumber(t *testing.T) {
+	// given
+	testBank := NewSimple[int](db.NewSimple[int]())
+
 	tests := []struct {
 		name       string
 		cardNumber string
@@ -91,8 +98,7 @@ func TestSimpleBank_VerifyCardNumber(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSimple[int]()
-			if got := s.VerifyCardNumber(tt.cardNumber); got != tt.want {
+			if got := testBank.VerifyCardNumber(tt.cardNumber); got != tt.want {
 				t.Errorf("VerifyCardNumber(%s) = %v, want %v", tt.cardNumber, got, tt.want)
 			}
 		})
@@ -100,6 +106,9 @@ func TestSimpleBank_VerifyCardNumber(t *testing.T) {
 }
 
 func TestSimpleBank_VerifyPIN(t *testing.T) {
+	// given
+	testBank := NewSimple[int](db.NewSimple[int]())
+
 	tests := []struct {
 		name string
 		pin  string
@@ -128,8 +137,7 @@ func TestSimpleBank_VerifyPIN(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewSimple[int]()
-			if got := s.VerifyPIN(tt.pin); got != tt.want {
+			if got := testBank.VerifyPIN(tt.pin); got != tt.want {
 				t.Errorf("VerifyPIN(%s) = %v, want %v", tt.pin, got, tt.want)
 			}
 		})

@@ -36,7 +36,7 @@ func (atm *ATM[T]) selectBankAccount(bankAccount account.BankAccount[T], r io.Re
 	var input string
 	for i := 0; i < iter; i++ {
 		fmt.Println("Select bank account.")
-		fmt.Printf("1. %s\n", bankAccount.Name())
+		fmt.Printf("1. %s\n", bankAccount.Type())
 		fmt.Println("2. Back")
 		fmt.Println("3. Exit")
 

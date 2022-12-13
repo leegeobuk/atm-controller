@@ -12,14 +12,14 @@ import (
 )
 
 func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
-	fmt.Printf("%s selected. ", account.Name())
+	fmt.Printf("%s selected. ", account.Type())
 
 	for true {
 		if option, err := atm.selectBankActions(os.Stdin, iter); err != nil {
 			fmt.Printf(inputFailedMsg, "bank action selection", iter)
 			break
 		} else if option == 1 {
-			fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
+			fmt.Printf("%s balance: %v\n", account.Type(), atm.bank.Balance(account))
 		} else if option == 2 || option == 3 {
 			amount, err := atm.promptAmount(os.Stdin, option, iter)
 			if err != nil {
@@ -30,12 +30,12 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 			switch option {
 			case 2:
 				atm.bank.Deposit(account, amount)
-				fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
+				fmt.Printf("%s balance: %v\n", account.Type(), atm.bank.Balance(account))
 			case 3:
 				if err = atm.bank.Withdraw(account, amount); err != nil {
 					fmt.Println("Withdrawal amount cannot be greater than balance.")
 				}
-				fmt.Printf("%s balance: %v\n", account.Name(), atm.bank.Balance(account))
+				fmt.Printf("%s balance: %v\n", account.Type(), atm.bank.Balance(account))
 			}
 		} else if option == 4 {
 			break
