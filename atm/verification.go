@@ -2,26 +2,37 @@ package atm
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/leegeobuk/atm-controller/bank"
 )
 
 func (atm *ATM[T]) promptVerification(iter int) {
 	cardNumber, err := atm.promptCardNumber(os.Stdin, iter)
 	if err != nil {
-		fmt.Printf(inputFailedMsg, "card number verification", iter)
+		fmt.Printf(inputFailedMsg, "card number validation", iter)
 		return
 	}
 
 	pin, err := atm.promptPIN(os.Stdin, iter)
 	if err != nil {
-		fmt.Printf(inputFailedMsg, "PIN verification", iter)
+		fmt.Printf(inputFailedMsg, "PIN validation", iter)
 		return
 	}
 
-	//userAccount := account.NewUser(wantPIN, pin)
-	atm.promptBankAccounts(cardNumber, pin, iter)
+	card, err := atm.bank.VerifyCard(cardNumber, pin)
+	if errors.Is(err, bank.ErrCardNumber) {
+		fmt.Println("Card number doesn't exist. Please try again.")
+		return
+	} else if errors.Is(err, bank.ErrPIN) {
+		fmt.Println("PIN is not correct. Please try again.")
+		return
+	}
+
+	atm.promptBankAccounts(card, iter)
 }
 
 func (atm *ATM[T]) promptCardNumber(r io.Reader, iter int) (string, error) {
@@ -38,8 +49,8 @@ func (atm *ATM[T]) promptCardNumber(r io.Reader, iter int) (string, error) {
 			continue
 		}
 
-		if isValid := atm.bank.VerifyCardNumber(cardNumber); !isValid {
-			fmt.Println("Card number doesn't exist. Please try again.")
+		if isValid := atm.bank.ValidateCardNumber(cardNumber); !isValid {
+			fmt.Println("Card number is invalid. Please try again.")
 			continue
 		}
 
@@ -63,8 +74,8 @@ func (atm *ATM[T]) promptPIN(r io.Reader, iter int) (string, error) {
 			continue
 		}
 
-		if isValid := atm.bank.VerifyPIN(pin); !isValid {
-			fmt.Println("PIN is not correct. Please try again.")
+		if isValid := atm.bank.ValidatePIN(pin); !isValid {
+			fmt.Println("PIN is invalid. Please try again.")
 			continue
 		}
 

@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	errWithdrawAmount = errors.New("withdraw larger than balance")
-	errWithdrawLimit  = errors.New("withdraw limit reached")
+	ErrWithdrawAmount = errors.New("withdraw larger than balance")
+	ErrWithdrawLimit  = errors.New("withdraw limit reached")
 )
 
 // SimpleCheckingAccount is a checking account
@@ -17,7 +17,7 @@ type SimpleCheckingAccount[T typeutil.Number] struct {
 	balance T
 }
 
-// NewSimpleChecking return SimpleCheckingAccount wit given balance.
+// NewSimpleChecking returns SimpleCheckingAccount wit given balance.
 func NewSimpleChecking[T typeutil.Number](balance T) *SimpleCheckingAccount[T] {
 	return &SimpleCheckingAccount[T]{
 		balance: balance,
@@ -38,7 +38,7 @@ func (acc *SimpleCheckingAccount[T]) Deposit(amount T) {
 // error is returned if amount > balance.
 func (acc *SimpleCheckingAccount[T]) Withdraw(amount T) error {
 	if amount > acc.balance {
-		return errWithdrawAmount
+		return ErrWithdrawAmount
 	}
 
 	acc.balance -= amount
