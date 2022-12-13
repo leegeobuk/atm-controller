@@ -53,15 +53,18 @@ func (sb *SimpleBank[T]) GetBankAccount(cardNumber string) (account.BankAccount[
 	return sb.db.GetAccount(cardNumber)
 }
 
+// Balance returns balance of the bankAccount.
 func (sb *SimpleBank[T]) Balance(bankAccount account.BankAccount[T]) T {
 	return bankAccount.Balance()
 }
 
+// Deposit deposits amount to bankAccount and updates it to db.
 func (sb *SimpleBank[T]) Deposit(bankAccount account.BankAccount[T], amount T) {
 	bankAccount.Deposit(amount)
 	sb.db.UpdateAccount(bankAccount)
 }
 
+// Withdraw withdraws amount from bankAccount and updates it to db.
 func (sb *SimpleBank[T]) Withdraw(bankAccount account.BankAccount[T], amount T) error {
 	if err := bankAccount.Withdraw(amount); err != nil {
 		return err

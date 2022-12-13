@@ -46,6 +46,8 @@ func (db *SimpleDB[T]) GetAccount(cardNumber string) (account.BankAccount[T], bo
 
 // UpdateAccount updates bank account.
 func (db *SimpleDB[T]) UpdateAccount(bankAccount account.BankAccount[T]) {
-	//TODO implement me
-	panic("implement me")
+	// SimpleDB doesn't need to do anything to update the state of bankAccount.
+	// This is because SimpleDB only stores in memory.
+	// If persistence is necessary, implement DB interface and connect it with
+	// actual db that saves on disk such as MySQL, MariaDB, MongoDB, etc.
 }
