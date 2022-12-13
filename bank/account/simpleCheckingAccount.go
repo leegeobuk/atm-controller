@@ -45,7 +45,7 @@ func (acc *SimpleCheckingAccount[T]) Withdraw(amount T) error {
 	return nil
 }
 
-// Type returns type of the bank account
+// Type returns type of the bank account.
 func (acc *SimpleCheckingAccount[T]) Type() string {
 	return "Checking account"
 }
