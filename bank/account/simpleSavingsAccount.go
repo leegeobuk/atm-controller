@@ -2,7 +2,7 @@ package account
 
 import "github.com/leegeobuk/atm-controller/typeutil"
 
-const savingsWithdrawLimit = 10
+const savingsWithdrawalLimit = 10
 
 // SimpleSavingsAccount is a savings account
 // that implements BankAccount.
@@ -13,7 +13,7 @@ type SimpleSavingsAccount[T typeutil.Number] struct {
 
 // NewSimpleSavings returns SimpleSavingsAccount with given balance.
 func NewSimpleSavings[T typeutil.Number](balance T) *SimpleSavingsAccount[T] {
-	return &SimpleSavingsAccount[T]{balance: balance, limit: savingsWithdrawLimit}
+	return &SimpleSavingsAccount[T]{balance: balance, limit: savingsWithdrawalLimit}
 }
 
 // Balance returns current balance.
