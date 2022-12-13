@@ -41,6 +41,10 @@ func (db *SimpleDB[T]) GetCard(carNumber string) (*_card.Card[T], bool) {
 // linked to the card with given card number.
 func (db *SimpleDB[T]) GetAccount(cardNumber string) (account.BankAccount[T], bool) {
 	card, ok := db.store[cardNumber]
+	if !ok {
+		return nil, false
+	}
+
 	return card.BankAccount(), ok
 }
 

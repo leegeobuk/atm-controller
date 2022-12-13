@@ -49,8 +49,13 @@ func (sb *SimpleBank[T]) VerifyCard(cardNumber, pin string) (*_card.Card[T], err
 }
 
 // GetBankAccount returns bank account linked to cardNumber.
-func (sb *SimpleBank[T]) GetBankAccount(cardNumber string) (account.BankAccount[T], bool) {
-	return sb.db.GetAccount(cardNumber)
+func (sb *SimpleBank[T]) GetBankAccount(cardNumber string) (account.BankAccount[T], error) {
+	bankAccount, ok := sb.db.GetAccount(cardNumber)
+	if !ok {
+		return nil, ErrCardNumber
+	}
+
+	return bankAccount, nil
 }
 
 // Balance returns balance of the bankAccount.

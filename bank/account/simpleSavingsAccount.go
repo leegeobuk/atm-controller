@@ -45,6 +45,11 @@ func (acc *SimpleSavingsAccount[T]) Withdraw(amount T) error {
 	return nil
 }
 
+// Limit returns how many times withdrawals can be made.
+func (acc *SimpleSavingsAccount[T]) Limit() int {
+	return acc.limit
+}
+
 // Type returns type of the bank account.
 func (acc *SimpleSavingsAccount[T]) Type() string {
 	return "Savings account"
