@@ -7,5 +7,5 @@ type BankAccount[T typeutil.Number] interface {
 	Balance() T
 	Deposit(amount T)
 	Withdraw(amount T) error
-	Name() string
+	Type() string
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/leegeobuk/atm-controller/bank"
 	"github.com/leegeobuk/atm-controller/cashbin"
+	"github.com/leegeobuk/atm-controller/db"
 	"github.com/leegeobuk/atm-controller/typeutil"
 )
 
@@ -76,7 +77,8 @@ func TestATM_selectMainAction(t *testing.T) {
 }
 
 func setup[T typeutil.Number]() (testATM *ATM[T], largeInput string) {
-	testBank, cashBin := bank.NewSimple[T](), cashbin.NewSimple()
+	testDB := db.NewSimple[T]()
+	testBank, cashBin := bank.NewSimple[T](testDB), cashbin.NewSimple()
 	testATM = New[T](testBank, cashBin)
 	largeInput = fmt.Sprintf("%s\n", strings.Repeat("1", bufio.MaxScanTokenSize))
 

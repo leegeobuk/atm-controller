@@ -6,34 +6,46 @@ import (
 	"github.com/leegeobuk/atm-controller/typeutil"
 )
 
+var (
+	errWithdrawAmount = errors.New("withdraw larger than balance")
+	errWithdrawLimit  = errors.New("withdraw limit reached")
+)
+
 // SimpleCheckingAccount is a checking account
-// that simply notates balance in integer.
+// that implements BankAccount.
 type SimpleCheckingAccount[T typeutil.Number] struct {
 	balance T
 }
 
-// Balance returns balance left.
-func (s *SimpleCheckingAccount[T]) Balance() T {
-	return s.balance
+// NewSimpleChecking return SimpleCheckingAccount wit given balance.
+func NewSimpleChecking[T typeutil.Number](balance T) *SimpleCheckingAccount[T] {
+	return &SimpleCheckingAccount[T]{
+		balance: balance,
+	}
 }
 
-// Deposit adds amount to balance and returns updated balance.
-func (s *SimpleCheckingAccount[T]) Deposit(amount T) {
-	s.balance += amount
+// Balance returns current balance.
+func (acc *SimpleCheckingAccount[T]) Balance() T {
+	return acc.balance
+}
+
+// Deposit adds amount to balance.
+func (acc *SimpleCheckingAccount[T]) Deposit(amount T) {
+	acc.balance += amount
 }
 
 // Withdraw withdraws money from balance and returns updated balance.
 // error is returned if amount > balance.
-func (s *SimpleCheckingAccount[T]) Withdraw(amount T) error {
-	if amount > s.balance {
-		return errors.New("cannot withdraw more than balance")
+func (acc *SimpleCheckingAccount[T]) Withdraw(amount T) error {
+	if amount > acc.balance {
+		return errWithdrawAmount
 	}
 
-	s.balance -= amount
+	acc.balance -= amount
 	return nil
 }
 
-// Name returns type of the bank account
-func (s *SimpleCheckingAccount[T]) Name() string {
+// Type returns type of the bank account
+func (acc *SimpleCheckingAccount[T]) Type() string {
 	return "Checking account"
 }
