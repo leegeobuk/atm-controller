@@ -2,6 +2,7 @@ package atm
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -11,15 +12,15 @@ import (
 	"github.com/leegeobuk/atm-controller/typeutil"
 )
 
-func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
-	fmt.Printf("%s selected. ", account.Type())
+func (atm *ATM[T]) promptBankActions(bankAccount account.BankAccount[T], iter int) {
+	fmt.Printf("%s selected. ", bankAccount.Type())
 
 	for true {
 		if option, err := atm.selectBankActions(os.Stdin, iter); err != nil {
 			fmt.Printf(inputFailedMsg, "bank action selection", iter)
 			break
 		} else if option == 1 {
-			fmt.Printf("%s balance: %v\n", account.Type(), atm.bank.Balance(account))
+			fmt.Printf("%s balance: %v\n", bankAccount.Type(), atm.bank.Balance(bankAccount))
 		} else if option == 2 || option == 3 {
 			amount, err := atm.promptAmount(os.Stdin, option, iter)
 			if err != nil {
@@ -29,13 +30,15 @@ func (atm *ATM[T]) promptBankActions(account account.BankAccount[T], iter int) {
 
 			switch option {
 			case 2:
-				atm.bank.Deposit(account, amount)
-				fmt.Printf("%s balance: %v\n", account.Type(), atm.bank.Balance(account))
+				atm.bank.Deposit(bankAccount, amount)
+				fmt.Printf("%s balance: %v\n", bankAccount.Type(), atm.bank.Balance(bankAccount))
 			case 3:
-				if err = atm.bank.Withdraw(account, amount); err != nil {
+				if err = atm.bank.Withdraw(bankAccount, amount); errors.Is(err, account.ErrWithdrawAmount) {
 					fmt.Println("Withdrawal amount cannot be greater than balance.")
+				} else if errors.Is(err, account.ErrWithdrawLimit) {
+					fmt.Println("Withdrawal limit reached. Cannot withdraw anymore.")
 				}
-				fmt.Printf("%s balance: %v\n", account.Type(), atm.bank.Balance(account))
+				fmt.Printf("%s balance: %v\n", bankAccount.Type(), atm.bank.Balance(bankAccount))
 			}
 		} else if option == 4 {
 			break

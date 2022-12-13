@@ -8,11 +8,12 @@ import (
 	"strconv"
 
 	"github.com/leegeobuk/atm-controller/bank/account"
+	"github.com/leegeobuk/atm-controller/bank/card"
 )
 
-func (atm *ATM[T]) promptBankAccounts(cardNumber, pin string, iter int) {
+func (atm *ATM[T]) promptBankAccounts(c *card.Card[T], iter int) {
 	fmt.Print("User verified. ")
-	bankAccount := atm.bank.GetBankAccount(cardNumber, pin)
+	bankAccount := c.BankAccount()
 
 	for true {
 		option, err := atm.selectBankAccount(bankAccount, os.Stdin, iter)

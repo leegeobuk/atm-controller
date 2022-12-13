@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/leegeobuk/atm-controller/bank/account"
+	_card "github.com/leegeobuk/atm-controller/bank/card"
 	"github.com/leegeobuk/atm-controller/typeutil"
 )
 
@@ -9,9 +10,10 @@ import (
 // It uses memory to store data.
 // No persistence is provided.
 type SimpleDB[T typeutil.Number] struct {
-	store map[string]account.BankAccount[T]
+	store map[string]*_card.Card[T]
 }
 
+// NewSimple returns new NewSimpleSavings account.
 func NewSimple[T typeutil.Number]() *SimpleDB[T] {
 	db := &SimpleDB[T]{}
 	db.init()
@@ -20,17 +22,26 @@ func NewSimple[T typeutil.Number]() *SimpleDB[T] {
 }
 
 func (db *SimpleDB[T]) init() {
-	db.store = map[string]account.BankAccount[T]{
-		"1234123412341234": account.NewSimpleChecking[T](12_341_234),
-		"1111111111111111": account.NewSimpleChecking[T](11_111_111),
-		"1234567812345678": account.NewSimpleChecking[T](12_345_678),
-		"1000100010001000": account.NewSimpleChecking[T](10_001_000),
-		"4321432143214321": account.NewSimpleChecking[T](43_214_321),
+	db.store = map[string]*_card.Card[T]{
+		"1234123412341234": _card.New[T]("1234123412341234", "1234", account.NewSimpleChecking[T](12_341_234)),
+		"1111111111111111": _card.New[T]("1111111111111111", "1111", account.NewSimpleChecking[T](11_111_111)),
+		"1234567812345678": _card.New[T]("1234567812345678", "1234", account.NewSimpleChecking[T](12_345_678)),
+		"1000100010001000": _card.New[T]("1000100010001000", "1000", account.NewSimpleSavings[T](10_001_000)),
+		"4321432143214321": _card.New[T]("4321432143214321", "4321", account.NewSimpleSavings[T](43_214_321)),
 	}
 }
 
-func (db *SimpleDB[T]) GetAccount(cardNumber string) account.BankAccount[T] {
-	return db.store[cardNumber]
+// GetCard returns card obtained from store.
+func (db *SimpleDB[T]) GetCard(carNumber string) (*_card.Card[T], bool) {
+	c, ok := db.store[carNumber]
+	return c, ok
+}
+
+// GetAccount returns bank account
+// linked to the card with given card number.
+func (db *SimpleDB[T]) GetAccount(cardNumber string) (account.BankAccount[T], bool) {
+	c, ok := db.store[cardNumber]
+	return c.BankAccount(), ok
 }
 
 func (db *SimpleDB[T]) UpdateAccount(bankAccount account.BankAccount[T]) {

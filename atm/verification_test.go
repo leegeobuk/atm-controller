@@ -49,13 +49,13 @@ func TestATM_promptCardNumber(t *testing.T) {
 			// simulate failures for iter times
 			tt.r = strings.NewReader(strings.Repeat(tt.input, tt.iter))
 
-			cardNumber, err := testATM.promptCardNumber(tt.r, tt.iter)
+			card, err := testATM.promptCardNumber(tt.r, tt.iter)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("promptCardNumber() err = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if cardNumber != tt.wantCardNumber {
-				t.Errorf("promptCardNumber() cardNumber = %v, wantCardNumber %v", cardNumber, tt.wantCardNumber)
+			if card != tt.wantCardNumber {
+				t.Errorf("promptCardNumber() card = %v, card %v", card, tt.wantCardNumber)
 			}
 		})
 	}

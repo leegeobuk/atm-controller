@@ -33,13 +33,14 @@ func (acc *SimpleSavingsAccount[T]) Deposit(amount T) {
 // If limit reaches 0, balance cannot be withdrawn anymore.
 func (acc *SimpleSavingsAccount[T]) Withdraw(amount T) error {
 	if amount > acc.balance {
-		return errWithdrawAmount
+		return ErrWithdrawAmount
 	}
 	if acc.limit == 0 {
-		return errWithdrawLimit
+		return ErrWithdrawLimit
 	}
 
 	acc.balance -= amount
+	acc.limit--
 
 	return nil
 }

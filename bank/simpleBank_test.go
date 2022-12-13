@@ -98,8 +98,8 @@ func TestSimpleBank_VerifyCardNumber(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := testBank.VerifyCardNumber(tt.cardNumber); got != tt.want {
-				t.Errorf("VerifyCardNumber(%s) = %v, want %v", tt.cardNumber, got, tt.want)
+			if got := testBank.ValidateCardNumber(tt.cardNumber); got != tt.want {
+				t.Errorf("ValidateCardNumber(%s) = %v, want %v", tt.cardNumber, got, tt.want)
 			}
 		})
 	}
@@ -137,8 +137,8 @@ func TestSimpleBank_VerifyPIN(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := testBank.VerifyPIN(tt.pin); got != tt.want {
-				t.Errorf("VerifyPIN(%s) = %v, want %v", tt.pin, got, tt.want)
+			if got := testBank.ValidatePIN(tt.pin); got != tt.want {
+				t.Errorf("ValidatePIN(%s) = %v, want %v", tt.pin, got, tt.want)
 			}
 		})
 	}
