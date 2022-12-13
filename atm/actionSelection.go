@@ -32,13 +32,23 @@ func (atm *ATM[T]) promptBankActions(bankAccount account.BankAccount[T], iter in
 			case 2:
 				atm.bank.Deposit(bankAccount, amount)
 				fmt.Printf("%s balance: %v\n", bankAccount.Type(), atm.bank.Balance(bankAccount))
+				atm.cashBin.Deposit(amount)
+				fmt.Printf("Cash bin cash: %v\n", atm.cashBin.Cash())
 			case 3:
 				if err = atm.bank.Withdraw(bankAccount, amount); errors.Is(err, account.ErrWithdrawAmount) {
 					fmt.Println("Cannot withdraw more than balance.")
+					continue
 				} else if errors.Is(err, account.ErrWithdrawLimit) {
 					fmt.Println("Cannot withdraw more than withdrawal limit.")
+					continue
 				}
 				fmt.Printf("%s balance: %v\n", bankAccount.Type(), atm.bank.Balance(bankAccount))
+
+				// withdraw from cash bin
+				if err = atm.cashBin.Withdraw(amount); err != nil {
+					fmt.Println("Cannot withdraw more than cash pool.")
+				}
+				fmt.Printf("Cash bin cash: %v\n", atm.cashBin.Cash())
 			}
 		} else if option == 4 {
 			break
